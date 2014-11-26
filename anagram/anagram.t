@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.10.0;
 
 use Test::More;
 use JSON qw(from_json);
@@ -15,23 +16,21 @@ if (open my $fh, '<', $cases_file) {
     die "Could not open '$cases_file' $!";
 }
 
-plan tests => 3 + @$cases;
-#diag explain $cases;
+note explain $cases;
 
-ok -e "$module.pm", "missing $module.pm"
-    or BAIL_OUT("You need to create a class called $module.pm with an function called match() that gets the original word as the first parameter and a reference to a list of word to check. It should return a referene to a list of words.");
+ok -e "$module.pm", "$module.pm exists"
+    or die "You need to create a class called $module.pm with an function called match() that gets the original word as the first parameter and a reference to a list of word to check. It should return a referene to a list of words.";
 
-eval "use $module";
-ok !$@, 'Cannot load $module.pm'
-    or BAIL_OUT("Does $module.pm compile?  Does it end with 1; ?");
+use_ok $module, "load $module.pm"
+    or die "Does $module.pm compile?  Does it end with 1; ?";
 
-can_ok($module, 'match') or BAIL_OUT("Missing package $module; or missing sub match()");
+can_ok($module, 'match')
+    or die "Missing package $module; or missing sub match()";
 
-my $sub = $module . '::match';
+my $sub = $module->can('match');
 
 foreach my $c (@$cases) {
-    no strict 'refs';
     is_deeply $sub->($c->{word}, @{ $c->{words} }), $c->{expected}, $c->{name};
 }
 
-
+done_testing();
