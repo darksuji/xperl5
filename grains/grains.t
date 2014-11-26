@@ -8,7 +8,7 @@ use bigint;
 
 my $cases_file = 'cases.json';
 my $cases;
-my $decoder = JSON::PP->new();
+my $decoder = JSON->new();
 $decoder->allow_bignum(1);
 
 if (open my $fh, '<', $cases_file) {
