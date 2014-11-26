@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.10.0;
+
 use open ':std', ':encoding(utf8)';
 use utf8;
 
@@ -37,19 +39,19 @@ my @cases = map {
     ['    ',                                           'Fine. Be that way!', 'prolonged silence'],
 );
 
-ok -e "$module.pm", "missing $module.pm"
-    or BAIL_OUT("You need to create a module called $module.pm with a function called hey() that gets one parameter: The text Bob hears.");
+ok -e "$module.pm", "$module.pm exists"
+    or die "You need to create a module called $module.pm with a function called hey() that gets one parameter: The text Bob hears.";
 
-use_ok('Bob')
-    or BAIL_OUT("Does $module.pm compile?  Does it end with 1; ?");
+use_ok($module)
+    or die "Does $module.pm compile?  Does it end with 1; ?";
 
 can_ok($module, 'hey')
-    or BAIL_OUT("Missing package $module; or missing sub hey()");
+    or die "Missing package $module; or missing sub hey()";
 
 my $sub = $module->can('hey');
 
 foreach my $c (@cases) {
-    #diag uc $c->{input};
+    note uc $c->{input};
     my $title = $c->{desc} ? "$c->{desc}: $c->{input}" : $c->{input};
     is $sub->( $c->{input} ), $c->{expect}, $title;
 }
