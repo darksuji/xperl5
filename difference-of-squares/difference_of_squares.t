@@ -1,39 +1,38 @@
 use strict;
 use warnings;
+use 5.10.0;
 
 use Test::More;
 
 my $module = $ENV{EXERCISM} ? 'Example' : 'Squares';
+sanity_check($module, qw/new sum_of_squares square_of_sums difference/);
 
-plan tests => 15;
+my @cases = (
+    { num => 5, square => 225, sum => 55, diff => 170 },
+    { num => 10, square => 3025, sum => 385, diff => 2640 },
+    { num => 100, square => 25_502_500, sum => 338_350, diff => 25_164_150 },
+);
 
-ok -e "$module.pm", "Missing $module.pm"
-        or BAIL_OUT "You need to create file: $module.pm";
+for my $c (@cases) {
+    is $module->new($c->{num})->square_of_sums, $c->{square},
+        "square_of_sums($c->{num})";
+    is $module->new($c->{num})->sum_of_squares, $c->{sum},
+        "sum_of_squares($c->{num})";
+    is $module->new($c->{num})->difference, $c->{diff},
+        "difference($c->{num})";
+}
 
-eval "use $module";
-ok !$@, "Cannot load $module"
-        or BAIL_OUT "Cannot load $module; Does it compile? Does it end with 1;?";
+done_testing();
 
-can_ok $module, "new"
-        or BAIL_OUT "Missing package $module; or missing sub new()";
+sub sanity_check {
+    my ($module, @subs) = @_;
 
-can_ok $module, "sum_of_squares"
-        or BAIL_OUT "Missing package $module; or missing sub sum_of_squares()";
+    ok -e "$module.pm", "$module.pm exists"
+        or die "Cannot find $module.pm.  Does it exist?";
 
-can_ok $module, "square_of_sums"
-        or BAIL_OUT "Missing package $module; or missing sub square_of_sums()";
+    use_ok $module, "can load module"
+        or die "Cannot load $module.  Does it compile?  Does it end with `1;`?";
 
-can_ok $module, "difference"
-        or BAIL_OUT "Missing package $module; or missing sub difference()";
-
-is $module->new(5)->square_of_sums, 225, "square_of_sums to 5";
-is $module->new(5)->sum_of_squares, 55, "sum_of_squares to 5";
-is $module->new(5)->difference, 170, "difference of 5";
-
-is $module->new(10)->square_of_sums, 3025, "square_of_sums to 10";
-is $module->new(10)->sum_of_squares, 385, "sum_of_squares to 10";
-is $module->new(10)->difference, 2640, "difference of 10";
-
-is $module->new(100)->square_of_sums, 25_502_500, "square_of_sums to 100";
-is $module->new(100)->sum_of_squares, 338_350, "sum_of_squares to 100";
-is $module->new(100)->difference, 25_164_150, "difference of 100";
+    can_ok $module, @subs
+        or die "Missing package $module or missing sub(s)";
+}
