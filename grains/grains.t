@@ -1,8 +1,9 @@
 use strict;
 use warnings;
+use 5.10.0;
 
 use Test::More;
-use JSON::PP;
+use JSON;
 use bigint;
 
 my $cases_file = 'cases.json';
