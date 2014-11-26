@@ -30,7 +30,7 @@ can_ok($module, 'match')
 my $sub = $module->can('match');
 
 foreach my $c (@$cases) {
-    is_deeply $sub->($c->{word}, @{ $c->{words} }), $c->{expected}, $c->{name};
+    is_deeply scalar $sub->($c->{word}, @{ $c->{words} }), $c->{expected}, $c->{name};
 }
 
 done_testing();
